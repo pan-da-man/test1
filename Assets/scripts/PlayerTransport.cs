@@ -28,11 +28,11 @@ public class TeleportOnCount : MonoBehaviour
             TeleportTo(new Vector3(57.48f, 0.5f, -3.14f));
             teleportedCount1 = true;
         }
-
+        //104.75f, 0.5f, -9f
         // Teleport for count == 2
         if (newCount == 2 && !teleportedCount2)
         {
-            TeleportTo(new Vector3(104.75f, 0.5f, -9f));
+            TeleportTo(new Vector3(86.7f, 1.1f, 8f));
             teleportedCount2 = true;
         }
     }

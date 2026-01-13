@@ -17,10 +17,14 @@ public class StableFPSCameraFollow : MonoBehaviour
     public float mouseSensitivity = 100f;
     private bool firstPersonEnabled = false;
 
+    [Header("Count 3 Settings")]
+    public Vector3 lastCameraPosition = new Vector3(0, 15, 0);  // Teleport position
+    private bool lastCameraEnabled = false;
+
     // FPS rotation state
     private float pitch = 0f;
     private float yaw = 0f;
-
+    public UIManager uiManager;
     void Start()
     {
         if (player == null)
@@ -35,50 +39,88 @@ public class StableFPSCameraFollow : MonoBehaviour
     }
 
     void LateUpdate()
+{
+    if (playerController == null || player == null)
+        return;
+
+    // -------- Count == 1: top-down view ----------
+    if (playerController.count == 1 && !movedForCount1)
     {
-        if (playerController == null || player == null)
-            return;
+        transform.position = cameraPositionCount1;
+        transform.rotation = Quaternion.Euler(cameraRotationCount1);
+        movedForCount1 = true;
+        firstPersonEnabled = false;
+        lastCameraEnabled = false;
 
-        // -------- Count == 1: top-down view ----------
-        if (playerController.count == 1 && !movedForCount1)
-        {
-            transform.position = cameraPositionCount1;
-            transform.rotation = Quaternion.Euler(cameraRotationCount1);
-            movedForCount1 = true;
-            Debug.Log("Camera moved for count 1!");
-        }
+        if (uiManager != null)
+            uiManager.IncrementCount();
+        else
+            Debug.LogWarning("UIManager reference is not set!");
 
-        // -------- Count == 2: first-person view ----------
-        if (playerController.count == 2 && !firstPersonEnabled)
-        {
-            firstPersonEnabled = true;
-
-            // Stop parenting so camera does not roll with ball
-            transform.SetParent(null);
-
-            // Initialize FPS rotation based on ball's forward
-            yaw = player.transform.eulerAngles.y;
-            pitch = 0f;
-
-            // Lock cursor for FPS
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-
-            Debug.Log("First-person camera enabled!");
-        }
-
-        // Handle FPS mouse look
-        if (firstPersonEnabled)
-        {
-            HandleMouseLook();
-
-            // Follow the ball at a small vertical offset
-            transform.position = player.transform.position + firstPersonOffset;
-        }
+        Debug.Log("Camera moved for count 1!");
     }
 
-    // Rotate camera based on mouse movement
-    private void HandleMouseLook()
+    // -------- Count == 2: first-person view ----------
+    if (playerController.count == 2 && !firstPersonEnabled)
+    {
+        firstPersonEnabled = true;
+        movedForCount1 = false;
+        lastCameraEnabled = false;
+
+        // Stop parenting so camera does not roll with ball
+        transform.SetParent(null);
+
+        // Initialize FPS rotation based on ball's forward
+        yaw = player.transform.eulerAngles.y;
+        pitch = 0f;
+
+        // Lock cursor for FPS
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (uiManager != null)
+            uiManager.IncrementCount();
+        else
+            Debug.LogWarning("UIManager reference is not set!");
+
+        Debug.Log("First-person camera enabled!");
+    }
+
+    // Handle FPS mouse look
+    if (firstPersonEnabled)
+    {
+        HandleMouseLook();
+
+        // Follow the ball at a small vertical offset
+        transform.position = player.transform.position + firstPersonOffset;
+    }
+
+    // -------- Count == 3: last camera with X rotation 90 ----------
+    if (playerController.count == 3 && !lastCameraEnabled)
+    {
+        lastCameraEnabled = true;
+        firstPersonEnabled = false;
+        movedForCount1 = false;
+
+        transform.position = lastCameraPosition;
+        transform.rotation = Quaternion.Euler(90f, 0f, 0f); // X rotation = 90
+
+        // Unlock cursor if it was locked
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        if (uiManager != null)
+            uiManager.IncrementCount();
+        else
+            Debug.LogWarning("UIManager reference is not set!");
+
+        Debug.Log("Last camera enabled with X rotation 90!");
+    }
+}
+
+
+// Rotate camera based on mouse movement
+private void HandleMouseLook()
     {
         if (Mouse.current == null)
             return;
