@@ -8,7 +8,13 @@ public class TeleportOnCount : MonoBehaviour
     // Track which counts have already triggered teleport
     private bool teleportedCount1 = false;
     private bool teleportedCount2 = false;
-
+    private void HidePlayerVisuals()
+    {
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            r.enabled = false;
+        }
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -25,16 +31,19 @@ public class TeleportOnCount : MonoBehaviour
         // Teleport for count == 1
         if (newCount == 1 && !teleportedCount1)
         {
-            TeleportTo(new Vector3(57.48f, 0.5f, -3.14f));
+            TeleportTo(new Vector3(32.5f, 0.5f, 4.5f));
             teleportedCount1 = true;
         }
         //104.75f, 0.5f, -9f
         // Teleport for count == 2
         if (newCount == 2 && !teleportedCount2)
         {
-            TeleportTo(new Vector3(86.7f, 1.1f, 8f));
+            TeleportTo(new Vector3(104.75f, 0.5f, -9f));
             teleportedCount2 = true;
+
+            HidePlayerVisuals(); // hides body, keeps FPP
         }
+
     }
 
     private void TeleportTo(Vector3 targetPosition)

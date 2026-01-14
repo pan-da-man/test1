@@ -13,7 +13,7 @@ public class StableFPSCameraFollow : MonoBehaviour
     private bool movedForCount1 = false;
 
     [Header("Count 2 Settings")]
-    public Vector3 firstPersonOffset = new Vector3(0, 2.5f, 0);  // Camera slightly above ball
+    public Vector3 firstPersonOffset = new Vector3(0, 2f, 0);  // Camera slightly above ball
     public float mouseSensitivity = 100f;
     private bool firstPersonEnabled = false;
 
